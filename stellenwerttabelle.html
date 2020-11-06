@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+#stellenwerttabelle {
+  font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+#customers td, #customers th {
+  border: 1px solid #ddd;
+  padding: 8px;
+}
+
+#stellenwerttabelle tr:nth-child(even){background-color: #f2f2f2;}
+
+#stellenwerttabelle tr:hover {background-color: #ddd;}
+
+#stellenwerttabelle th {
+  padding-top: 12px;
+  padding-bottom: 12px;
+  text-align: left;
+  background-color: #4CAF50;
+  color: white;
+}
+</style>
+</head>
+<body>
+
+<table id="stellenwerttabelle"></table>
+
+<script language="javascript">
+    function refresh() {
+        // Initialize the random numbers
+        for (var tableArr=[],i=0;i<10;++i) tableArr[i]=(Math.random() * 1000000).toFixed(Math.random() * 4);
+        
+        var table = document.getElementById("stellenwerttabelle");
+
+        var allRows = [];
+
+        // Add Header
+        header_labels = ['', '...', 'M', 'HT', 'ZT', 'T', 'H', 'Z', 'E', ',', 'z', 'h', 't', ''];
+        var row = '<tr>'
+        for (header_labels, i=0; i<header_labels.length;i++) {
+                row = row + '<th>' + header_labels[i] + '</th>';
+            }
+        row = row + "</tr>";
+        allRows.push(row);
+
+        // Add each line
+        for (let num of tableArr) {
+            var row = '<tr>'+'<td>'+num+'</td>';
+            numfixed = pad(numToLocale(parseFloat(num).toFixed(3)),12);
+            //alert(num + ' - ' + numfixed);
+
+            for (i=1; i<(header_labels.length -1);i++) {
+              digit = numfixed.substr(numfixed.length - i+1, 1);
+              row = row + '<td><input text="" id="fname" name="eingabe" maxlength="1" style="width:2em"/><input type="hidden" id="fname" name="solution" value="' + digit + '" /></td>';
+            }
+            row = row + '<td></td></tr>';
+            allRows.push(row);
+        }
+        
+        //append all rows to page
+        document.getElementById("stellenwerttabelle").innerHTML = allRows.join(' ');
+    }
+
+    function correct() {
+
+      // we disable the button
+      var buttonCorrect = document.getElementById("evaluate_entries");
+      buttonCorrect.disabled = true;
+
+      var table = document.getElementById("stellenwerttabelle");
+      for (var j = 1 ; j < table.rows.length; j++) { // for each row..
+        eingabe = '';
+        solution = '';
+        for (var k = 1; k < 13; k++) {
+          eingabe += document.getElementsByName("eingabe")[(j-1)*12+k].value;
+          solution = document.getElementsByName("solution")[(j-1)*12+k].value + solution;
+        }
+        alert(eingabe + ' vs ' + solution);
+        if (parseFloat(eingabe) == parseFloat(solution)) {
+          // Input was correct
+          table.rows[j].cells[13].innerHTML = '<span style="color:green;">&#x2713;</span>';
+        } else {
+          // Input was wrong.
+          table.rows[j].cells[13].innerHTML = '<span style="color:red;">&#x2717;</span> Lösung: ' + numToLocale(solution);
+        }
+      }
+    }
+
+    // get the current locale of the user
+    function getLang()
+      {
+        if (navigator.languages != undefined) 
+          return navigator.languages[0]; 
+        else 
+          return navigator.language;
+      }
+    // transform a number into its localized version (for display purpose, but also comparison with user input)
+    function numToLocale(n)
+    {
+      return n.toLocaleString(getLang());
+    } 
+
+    // adds leading zeros
+    function pad(num, size) {
+      num = num.toString();
+      while (num.length < size) num = "0" + num;
+      return num;
+    }
+    </script>
+<button onclick="refresh()" name="new_values">Neuen Werte</button>
+<button onclick="correct()" id="evaluate_entries">Korrektur</button>
+
+<script> window.onload = "refresh()" </script>
+
+
+</body>
+</html>

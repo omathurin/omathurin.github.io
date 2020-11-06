@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+#stellenwerttabelle {
+  font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+#customers td, #customers th {
+  border: 1px solid #ddd;
+  padding: 8px;
+}
+
+#stellenwerttabelle tr:nth-child(even){background-color: #f2f2f2;}
+
+#stellenwerttabelle tr:hover {background-color: #ddd;}
+
+#stellenwerttabelle th {
+  padding-top: 12px;
+  padding-bottom: 12px;
+  text-align: left;
+  background-color: #4CAF50;
+  color: white;
+}
+
+.highlight:before{
+    content : '✓';
+    color : green;
+}
+</style>
+</head>
+<body>
+
+<p>Runde die Dezimalzahle:</p>
+<table id="stellenwerttabelle"></table>
+
+<script language="javascript">
+    function refresh() {
+        // Initialize the random numbers
+        for (var tableArr=[],i=0;i<10;++i) tableArr[i]=(Math.random() * 50).toFixed(Math.random() * 4);;
+        
+        var table = document.getElementById("stellenwerttabelle");
+
+        var allRows = [];
+
+        // Add Header
+        header_labels = ['Zahl', 'Dezimal', 'Deine Antwort', 'Lösung'];
+        var row = '<tr>'
+        for (header_labels, i=0; i<header_labels.length;i++) {
+                row = row + '<th>' + header_labels[i] + '</th>';
+            }
+        row = row + "</tr>";
+        allRows.push(row);
+
+        decimal_labels = ['E', 'z', 'h', 't']
+        // Add each line
+        for (let num of tableArr) {
+
+            // lets random the decimal rounding we look for
+            count_decimal = Math.ceil(Math.random() * 3);
+            question_decimal = Math.ceil(Math.random() * count_decimal);
+         
+            question_factor = 10**(question_decimal);
+
+            // we generate the magic number
+            num = (Math.random() * 50).toFixed(1+count_decimal);
+
+            // we derive the potential solution
+            solution = Math.round(num * question_factor)/question_factor;
+
+            // we display everything needed:
+
+            var row = '<tr>'+'<td>' + numToLocale(parseFloat(num)) + '</td>';
+            row = row + '<td>(' + decimal_labels[question_decimal] + ')</td>';
+            row = row + '<td><input text="" id="fname" name="eingabe"/><input type="hidden" id="fname" name="solution" value="' + numToLocale(solution) + '" /></td>';
+            row = row + '<td></td>';
+            row = row + '</tr>';
+            allRows.push(row);
+        }
+        
+        //append all rows to page
+        document.getElementById("stellenwerttabelle").innerHTML = allRows.join(' ');
+
+
+        // we enable the button
+        var buttonCorrect = document.getElementById("evaluate_entries");
+        buttonCorrect.disabled = false;
+    }
+
+    function correct() {
+
+      // we disable the button
+      var buttonCorrect = document.getElementById("evaluate_entries");
+      buttonCorrect.disabled = true;
+
+      var table = document.getElementById("stellenwerttabelle");
+      for (var j = 1 ; j < table.rows.length; j++) {
+        // alert('j =' + j);
+        // alert('lentgh =' + document.getElementsByName("solution").length);
+        eingabe = document.getElementsByName("eingabe")[j-1].value;
+        solution = document.getElementsByName("solution")[j-1].value;
+
+        if (numToLocale(eingabe) == numToLocale(solution)) {
+          // Input was correct
+          table.rows[j].cells[3].innerHTML = '<span style="color:green;">&#x2713;</span>';
+        } else {
+          // Input was wrong.
+          table.rows[j].cells[3].innerHTML = '<span style="color:red;">&#x2717;</span> Lösung: ' + numToLocale(solution);
+        }
+      }
+    }
+
+    // get the current locale of the user
+    function getLang()
+      {
+        if (navigator.languages != undefined) 
+          return navigator.languages[0]; 
+        else 
+          return navigator.language;
+      }
+    // transform a number into its localized version (for display purpose, but also comparison with user input)
+    function numToLocale(n)
+    {
+      return n.toLocaleString(getLang());
+    } 
+</script>
+<button onclick="refresh()" name="new_values">Neuen Werte</button>
+<button onclick="correct()" id="evaluate_entries">Korrektur</button>
+
+
+</body>
+</html>

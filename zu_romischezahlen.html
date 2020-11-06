@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+#stellenwerttabelle {
+  font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+#customers td, #customers th {
+  border: 1px solid #ddd;
+  padding: 8px;
+}
+
+#stellenwerttabelle tr:nth-child(even){background-color: #f2f2f2;}
+
+#stellenwerttabelle tr:hover {background-color: #ddd;}
+
+#stellenwerttabelle th {
+  padding-top: 12px;
+  padding-bottom: 12px;
+  text-align: left;
+  background-color: #4CAF50;
+  color: white;
+}
+
+.highlight:before{
+    content : '✓';
+    color : green;
+}
+</style>
+</head>
+<body>
+<p>Schreib in Romischerzahle:</p>
+<table id="stellenwerttabelle"></table>
+
+<script language="javascript">
+    function roman_to_Int(str1)
+    {
+        if(str1 == null) return -1;
+        var num = char_to_int(str1.charAt(0));
+        var pre, curr;
+
+        for(var i = 1; i < str1.length; i++)
+        {
+            curr = char_to_int(str1.charAt(i));
+            pre = char_to_int(str1.charAt(i-1));
+            if(curr <= pre)
+            {
+                num += curr;
+            } else {
+                num = num - pre*2 + curr;
+            }
+        }
+        return num;
+    }
+
+    function char_to_int(c)
+    {
+        switch (c)
+        {
+            case 'I': return 1;
+            case 'V': return 5;
+            case 'X': return 10;
+            case 'L': return 50;
+            case 'C': return 100;
+            case 'D': return 500;
+            case 'M': return 1000;
+            default: return -1;
+        }
+    }
+
+    function romanize(num)
+    {
+        var lookup = {M:1000,CM:900,D:500,CD:400,C:100,XC:90,L:50,XL:40,X:10,IX:9,V:5,IV:4,I:1};
+        var roman = '';
+        var i;
+        for ( i in lookup ) {
+            while ( num >= lookup[i] ) {
+            roman += i;
+            num -= lookup[i];
+            }
+        }
+        return roman;
+    }
+
+    function refresh() {
+        // Initialize the random numbers
+        for (var tableArr=[],i=0;i<10;++i) tableArr[i]=(Math.random() * 50).toFixed(Math.random() * 4);;
+        
+        var table = document.getElementById("stellenwerttabelle");
+
+        var allRows = [];
+
+        // Add Header
+        header_labels = ['Zahl', 'Deine Antwort', 'Lösung'];
+        var row = '<tr>'
+        for (header_labels, i=0; i<header_labels.length;i++) {
+                row = row + '<th>' + header_labels[i] + '</th>';
+            }
+        row = row + "</tr>";
+        allRows.push(row);
+
+        // Add each line
+        for (let num of tableArr) {
+
+            // lets random the decimal rounding we look for
+           
+
+            // we generate the magic number
+            num = Math.round((Math.random() * 2000));
+
+            // we derive the potential solution
+            solution = num;
+
+            // we display everything needed:
+
+            var row = '<tr>'+'<td>' + num + '</td>';
+            row = row + '<td><input text="" id="fname" name="eingabe"/><input type="hidden" id="fname" name="solution" value="' + romanize(solution) + '" /></td>';
+            row = row + '<td></td>';
+            row = row + '</tr>';
+            allRows.push(row);
+        }
+        
+        //append all rows to page
+        document.getElementById("stellenwerttabelle").innerHTML = allRows.join(' ');
+
+
+        // we enable the button
+        var buttonCorrect = document.getElementById("evaluate_entries");
+        buttonCorrect.disabled = false;
+    }
+
+    function correct() {
+
+      // we disable the button
+      var buttonCorrect = document.getElementById("evaluate_entries");
+      buttonCorrect.disabled = true;
+
+      var table = document.getElementById("stellenwerttabelle");
+      for (var j = 1 ; j < table.rows.length; j++) {
+        // alert('j =' + j);
+        // alert('lentgh =' + document.getElementsByName("solution").length);
+        eingabe = document.getElementsByName("eingabe")[j-1].value;
+        solution = document.getElementsByName("solution")[j-1].value;
+
+        if (eingabe == solution) {
+          // Input was correct
+          table.rows[j].cells[2].innerHTML = '<span style="color:green;">&#x2713;</span>';
+        } else {
+          // Input was wrong.
+          table.rows[j].cells[2].innerHTML = '<span style="color:red;">&#x2717;</span> Lösung: ' + solution;
+        }
+      }
+    }
+
+</script>
+<button onclick="refresh()" name="new_values">Neuen Werte</button>
+<button onclick="correct()" id="evaluate_entries">Korrektur</button>
+
+
+</body>
+</html>
