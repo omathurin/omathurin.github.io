@@ -140,6 +140,7 @@ function main() {
       cv.cvtColor(faceResized, faceResized, cv.COLOR_BGR2RGB);
       cv.imshow(canvas, faceResized);
       faceResized.delete();
+
       document.getElementById('addPersonButton').disabled = true;
     }
   };
@@ -183,7 +184,9 @@ function main() {
         captureFrame();
         document.getElementById('startStopButton').innerHTML = 'Stop the examination';
         document.getElementById('startStopButton').disabled = false;
-        document.getElementById('addPersonButton').disabled = false;
+        if (Object.keys(persons).length == 0) {
+            document.getElementById('addPersonButton').disabled = false;
+        }
       }
       if (netDet == undefined || netRecogn == undefined) {
         document.getElementById('startStopButton').disabled = true;
