@@ -9,6 +9,7 @@
 <script type='text/javascript'>
 var netDet = undefined, netRecogn = undefined;
 var persons = {};
+var cheatCounter = 0;
 
 //! [Run face detection model]
 function detectFaces(img) {
@@ -65,6 +66,7 @@ function recognize(face) {
   if (Object.keys(persons).length > 0) {
     if (bestMatchName == 'unknown') {
         document.getElementById('status').innerHTML = '<div style="color: #FF0000;"><b>Cheater detected!</b></div>';
+        cheatCounter++;
     } else {
         document.getElementById('status').innerHTML = 'Ok. Not a cheater so far.';
     }
@@ -178,6 +180,18 @@ function main() {
       isRunning = false;
       document.getElementById('startStopButton').innerHTML = 'Start the examination';
       document.getElementById('addPersonButton').disabled = true;
+
+      // Lets display the proctoring results
+      if (cheatCounter > 0) {
+          msg = 'The examination is terminated. The candidate cheated ' + cheatCounter + ' time(s)';
+          alert(msg);
+      } else {
+          msg = 'The examination is terminated. The candidate did NOT cheated!';
+          alert(msg);
+      }
+      // we reset the counter
+      cheatCounter = 0;
+
     } else {
       function run() {
         isRunning = true;
